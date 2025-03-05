@@ -18,7 +18,7 @@ run this command in terminal.
 npx prisma migrate dev --name initial_migrate
 ```
 
-Finnaly you can run:
+Finally you can run:
 
 ```bash
 npm run dev
