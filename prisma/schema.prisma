@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Type {
+  BENEFIT
+  COST
+}
+
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  nama     String
+  jabatan  String
+  password String
+
+  Karyawan  Karyawan[]
+  Penilaian PenilaianMatrix[]
+
+  @@map("user")
+}
+
+model Kriteria {
+  id            String @id @default(cuid())
+  nama_kriteria String
+  type          Type   @default(BENEFIT) // 'cost' atau 'benefit'
+
+  bobot                 Bobot[]
+  DetailPenilaianMatrix DetailPenilaianMatrix[]
+
+  @@map("kriteria")
+}
+
+model Bobot {
+  id          String @id @default(cuid())
+  nilai_bobot Float
+  id_kriteria String
+
+  kriteria              Kriteria                @relation(fields: [id_kriteria], references: [id])
+  DetailPenilaianMatrix DetailPenilaianMatrix[]
+
+  @@map("bobot")
+}
+
+model Karyawan {
+  id            String  @id @default(cuid())
+  user_id       String
+  nama_karyawan String
+  no_telp       String
+  alamat        String
+  isPenilaian   Boolean @default(false)
+
+  user      User              @relation(fields: [user_id], references: [id])
+  penilaian PenilaianMatrix[]
+
+  @@map("karyawan")
+}
+
+model PenilaianMatrix {
+  id           String @id @default(cuid())
+  id_karyawan  String
+  user_id      String
+  komunikasi   Float?
+  etika        Float?
+  kinerja      Float?
+  kreativitas  Float?
+  kedisiplinan Float?
+
+  karyawan              Karyawan                @relation(fields: [id_karyawan], references: [id])
+  user                  User                    @relation(fields: [user_id], references: [id])
+  DetailPenilaianMatrix DetailPenilaianMatrix[]
+
+  @@map("penilaian_matrix")
+}
+
+model DetailPenilaianMatrix {
+  id                  String @id @default(cuid())
+  id_bobot            String
+  id_kriteria         String
+  id_penilaian_matrix String
+
+  bobot            Bobot           @relation(fields: [id_bobot], references: [id])
+  kriteria         Kriteria        @relation(fields: [id_kriteria], references: [id])
+  penilaian_matrix PenilaianMatrix @relation(fields: [id_penilaian_matrix], references: [id], onDelete: Cascade)
+
+  @@map("detail_penilaian_matrix")
+}

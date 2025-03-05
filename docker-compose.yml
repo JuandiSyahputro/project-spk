@@ -1,0 +1,23 @@
+services:
+  # Layanan MariaDB
+  db:
+    image: mariadb:latest
+    container_name: mariadb_spk
+    environment:
+      - MYSQL_ROOT_PASSWORD=password # Password untuk root user
+      - MYSQL_DATABASE=spk_penilaian_karyawan # Database yang akan dibuat
+      - MYSQL_USER=root # User database
+      - MYSQL_PASSWORD=password # Password user
+    ports:
+      - "3307:3306" # Port MariaDB (host:container)
+
+  # Layanan phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin_spk
+    environment:
+      - PMA_HOST = db # Mengarah ke layanan MariaDB
+      - PMA_USER = root # User untuk login phpMyAdmin
+      - PMA_PASSWORD = password # Password untuk login phpMyAdmin
+    ports:
+      - "9003:80" # Port phpMyAdmin (host:container)
